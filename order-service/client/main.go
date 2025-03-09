@@ -8,6 +8,7 @@ import (
 	pb "github.com/vaanskii/ecommerce-microservices/order-service/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+	"google.golang.org/grpc/metadata"
 )
 
 func main() {
@@ -19,13 +20,21 @@ func main() {
 
 	client := pb.NewOrderServiceClient(conn)
 
+	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikdpb3JnaSIsImV4cCI6MTc0MTYxOTA2M30.B1YTJsp2XfuIXbCBdRxpzh3g00w3VcrV81rVESJ11i8"
+
+	md := metadata.New(map[string]string{
+		"authorization": "Bearer " + token,
+	})
+
+	ctx := metadata.NewOutgoingContext(context.Background(), md)
+
 	req := &pb.CreateOrderRequest{
-		ProductId: "123",
+		ProductId: "456",
 		Quantity: 2,
 		CustomerName: "Giorgi Vanadze",
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+	ctx, cancel := context.WithTimeout(ctx, time.Second)
 	defer cancel()
 
 	res, err := client.CreateOrder(ctx, req)
