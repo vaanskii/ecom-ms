@@ -4,6 +4,7 @@ import (
 	"log"
 	"net"
 
+	"github.com/vaanskii/ecommerce-microservices/order-service/middleware"
 	pb "github.com/vaanskii/ecommerce-microservices/order-service/proto"
 	"github.com/vaanskii/ecommerce-microservices/order-service/services"
 	"google.golang.org/grpc"
@@ -15,7 +16,9 @@ func main() {
      log.Fatalf("Failed to listen on port 50052: %v", err)
  }
 
- grpcServer := grpc.NewServer()
+ grpcServer := grpc.NewServer(
+	grpc.UnaryInterceptor(middleware.UnaryAuthInterceptor),
+ )
 
  orderService := &services.OrderServiceServer{}
  pb.RegisterOrderServiceServer(grpcServer, orderService)
