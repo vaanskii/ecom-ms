@@ -1,4 +1,3 @@
-// product-service
 package main
 
 import (
