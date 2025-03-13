@@ -3,8 +3,10 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
+	"github.com/joho/godotenv"
 	pb "github.com/vaanskii/ecommerce-microservices/order-service/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -12,6 +14,10 @@ import (
 )
 
 func main() {
+	if err := godotenv.Load("../.env"); err != nil {
+		log.Fatalf("Error loading .env file: %v", err)
+	}
+
 	conn, err := grpc.NewClient("localhost:50052", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("Could not connect to product-service: %v", err)
@@ -20,7 +26,7 @@ func main() {
 
 	client := pb.NewOrderServiceClient(conn)
 
-	token := "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikdpb3JnaSIsImV4cCI6MTc0MTYxOTA2M30.B1YTJsp2XfuIXbCBdRxpzh3g00w3VcrV81rVESJ11i8"
+	token := os.Getenv("TOKEN")
 
 	md := metadata.New(map[string]string{
 		"authorization": "Bearer " + token,
