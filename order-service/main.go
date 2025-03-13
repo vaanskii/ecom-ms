@@ -12,13 +12,7 @@ import (
 )
 
 func main() {
-	conn, ch, err := utils.ConnectToRabbitMQ()
-	if err != nil {
-		log.Fatalf("cannot connect to RabbitMQ: %v", err)
-	}
-	defer conn.Close()
-	defer ch.Close()
-
+	utils.ConnectToRabbitMQ()
 
 	listener, err := net.Listen("tcp", ":50052")
 	if err != nil {
