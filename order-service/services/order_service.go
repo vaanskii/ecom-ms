@@ -10,6 +10,7 @@ import (
 
 	"github.com/google/uuid"
 	pb "github.com/vaanskii/ecommerce-microservices/order-service/proto"
+	"github.com/vaanskii/ecommerce-microservices/order-service/utils"
 	pbProduct "github.com/vaanskii/ecommerce-microservices/product-service/proto"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
@@ -84,8 +85,12 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *pb.CreateOrde
 		CustomerName: req.CustomerName,
 		Status: "Order Created",
 	}
-
 	SaveOrder(order)
+
+	err = utils.PublishMessage("order_created", order)
+	if err != nil {
+        log.Printf("Failed to publish order to RabbitMQ: %v", err)
+    }
 
 	return &pb.CreateOrderResponse{
 		OrderId: order.OrderID,
