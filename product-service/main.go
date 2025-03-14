@@ -7,12 +7,28 @@ import (
 	"github.com/vaanskii/ecommerce-microservices/product-service/db"
 	pb "github.com/vaanskii/ecommerce-microservices/product-service/proto"
 	services "github.com/vaanskii/ecommerce-microservices/product-service/services"
+	"github.com/vaanskii/ecommerce-microservices/product-service/utils"
 	"google.golang.org/grpc"
 )
 
 
 func main() {
 	db.SetupDatabase()
+
+	processFunc := func(order utils.Order) {
+		product, err := db.GetProductByID(order.ProductID)
+		if err != nil {
+            log.Printf("Product not found for order: %v", err)
+            return
+        }
+		log.Printf("Processing Order: %+v. Product: %+v", order, product)
+	}
+
+	utils.ConnectToRabbitMQ(processFunc)
+	defer utils.CloseRabbitMQ()
+
+	go utils.ConsumeOrders("order_created", processFunc)
+
 
 	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
