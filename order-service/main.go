@@ -5,6 +5,7 @@ import (
 	"net"
 	"time"
 
+	"github.com/vaanskii/ecommerce-microservices/order-service/db"
 	"github.com/vaanskii/ecommerce-microservices/order-service/middleware"
 	pb "github.com/vaanskii/ecommerce-microservices/order-service/proto"
 	"github.com/vaanskii/ecommerce-microservices/order-service/services"
@@ -13,6 +14,8 @@ import (
 )
 
 func main() {
+	db.SetupDatabase()
+
 	utils.ConnectToRabbitMQ()
 
 	go func() {
