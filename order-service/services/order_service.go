@@ -2,13 +2,12 @@ package services
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"log"
-	"sync"
 	"time"
 
 	"github.com/google/uuid"
+	OrderDB "github.com/vaanskii/ecommerce-microservices/order-service/db"
 	pb "github.com/vaanskii/ecommerce-microservices/order-service/proto"
 	"github.com/vaanskii/ecommerce-microservices/order-service/utils"
 	pbProduct "github.com/vaanskii/ecommerce-microservices/product-service/proto"
@@ -23,20 +22,26 @@ type OrderServiceServer struct {
 type Order struct {
 	OrderID       	string  
 	ProductID 		string
-	Quantity 		int32
 	CustomerName	string
+	Quantity 		int32
 	Status  		string
 }
 
-var (
-	orders = make(map[string]Order)
-	mu sync.Mutex
-)
-
-func SaveOrder(order Order) {
-	mu.Lock()
-	defer mu.Unlock()
-	orders[order.OrderID] = order
+func SaveOrder(order Order) error {
+	db := OrderDB.GetDBInstance()
+	newOrder := OrderDB.Orders{
+		OrderID:   order.OrderID,
+		ProductID: order.ProductID,
+		CustomerName: order.CustomerName,
+		Quantity: order.Quantity,
+		Status: order.Status,
+		CreatedAt: time.Now(),
+	}
+	if err := db.Create(&newOrder).Error; err != nil {
+		log.Printf("failed to save order in database: %v", err)
+	}
+	log.Printf("order saved to the database: %v", newOrder)
+	return nil
 }
 
 func GetProductByID(productID string) (*pbProduct.ProductResponse, error) {
@@ -53,17 +58,6 @@ func GetProductByID(productID string) (*pbProduct.ProductResponse, error) {
 	defer cancel()
 
 	return client.GetProductByID(ctx, &pbProduct.ProductRequest{Id: productID})
-}
-
-func GetOrderByID(orderID string) (*Order, error) {
-	mu.Lock()
-	defer mu.Unlock()
-
-	order, exists := orders[orderID]
-	if !exists {
-		return nil, errors.New("order not found")
-	}
-	return &order, nil
 }
 
 func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
@@ -85,8 +79,10 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *pb.CreateOrde
 		CustomerName: req.CustomerName,
 		Status: "Order Created",
 	}
-	SaveOrder(order)
-
+	if err := SaveOrder(order); err != nil {
+        return nil, fmt.Errorf("failed to save order: %v", err)
+    }
+	
 	err = utils.PublishMessage("order_created", order)
 	if err != nil {
         log.Printf("Failed to publish order to RabbitMQ: %v", err)
