@@ -5,9 +5,10 @@ import "gorm.io/gorm"
 var db *gorm.DB
 
 type Product struct {
-	ID 		string 	`gorm:"primaryKey"`
-	Name 	string
-	Price 	float32
+	ID 		   string 	`gorm:"primaryKey"`
+	Name 	   string
+	Price 	   float32
+	Quantity   int32
 }
 
 func GetProductByID(id string) (*Product, error) {
