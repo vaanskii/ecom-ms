@@ -28,7 +28,7 @@ func ConnectToRabbitMQ(processFunc func(Order)) (*amqp.Connection, *amqp.Channel
 	rabbitConn, rabbitChannel, err = establishConnection()
 	if err != nil {
 		log.Printf("Initial connection to RabbitMQ failed: %v. Starting reconnection...", err)
-		// new handler
+		go reconnectToRabbitMQ(processFunc)
 		return nil, nil
 	}
 
