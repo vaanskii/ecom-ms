@@ -25,9 +25,14 @@ func SetupDatabase() {
 
 	dsn := fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbName)
 
-	_, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
+	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
 		log.Fatal("failed to connect to the database:", err)
+	}
+
+	err = db.AutoMigrate(&Orders{})
+	if err != nil {
+		log.Fatal("failed to migrate database:", err)
 	}
 
 	log.Println("Database connected successfully!",)
