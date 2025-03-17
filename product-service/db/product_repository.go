@@ -32,3 +32,7 @@ func GetAllProducts() ([]Product, error) {
 
 	return products, nil
 }
+
+func GetDBInstance() *gorm.DB {
+	return db
+}
