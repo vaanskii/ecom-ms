@@ -42,3 +42,22 @@ func (s *ProductServiceServer) GetAllProducts(ctx context.Context, req *pb.Empty
 
 	return &pb.ProductListResponse{Products: productResponse}, nil
 }
+
+func (s *ProductServiceServer) UpdateProductQuantity(ctx context.Context, req *pb.UpdateQuantityRequest) (*pb.UpdateQuantityResponse, error) {
+	DB := db.GetDBInstance()
+	product, err := db.GetProductByID(req.Id)
+	if err != nil {
+		return nil, fmt.Errorf("product not found, %v", err)
+	}
+
+	if product.Quantity < req.Quantity {
+		return &pb.UpdateQuantityResponse{Success: false}, nil
+	}
+
+	product.Quantity -= req.Quantity 
+	if err := DB.Save(&product).Error; err != nil {
+		return nil, fmt.Errorf("failed to update product quantity: %v", err)
+	}
+
+	return &pb.UpdateQuantityResponse{Success: true}, nil
+}
