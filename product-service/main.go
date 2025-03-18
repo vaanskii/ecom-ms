@@ -27,7 +27,7 @@ func main() {
 	utils.ConnectToRabbitMQ(processFunc)
 	defer utils.CloseRabbitMQ()
 
-	utils.InitRedis()
+	utils.InitRedis() 
 
 	go utils.ConsumeOrders("order_created", processFunc)
 
