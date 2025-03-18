@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/vaanskii/ecommerce-microservices/product-service/db"
-	pb "github.com/vaanskii/ecommerce-microservices/product-service/proto"
+	"github.com/vaanskii/ecom-ms/product-service/db"
+	pb "github.com/vaanskii/ecom-ms/product-service/proto"
 )
 
 type ProductServiceServer struct {
