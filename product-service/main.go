@@ -4,10 +4,10 @@ import (
 	"log"
 	"net"
 
-	"github.com/vaanskii/ecommerce-microservices/product-service/db"
-	pb "github.com/vaanskii/ecommerce-microservices/product-service/proto"
-	services "github.com/vaanskii/ecommerce-microservices/product-service/services"
-	"github.com/vaanskii/ecommerce-microservices/product-service/utils"
+	"github.com/vaanskii/ecom-ms/product-service/db"
+	pb "github.com/vaanskii/ecom-ms/product-service/proto"
+	services "github.com/vaanskii/ecom-ms/product-service/services"
+	"github.com/vaanskii/ecom-ms/product-service/utils"
 	"google.golang.org/grpc"
 )
 
