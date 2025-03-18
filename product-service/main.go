@@ -31,7 +31,6 @@ func main() {
 
 	go utils.ConsumeOrders("order_created", processFunc)
 
-
 	listener, err := net.Listen("tcp", ":50051")
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
