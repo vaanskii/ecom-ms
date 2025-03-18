@@ -44,7 +44,7 @@ func SaveOrder(order Order) error {
 	return nil
 }
 
-func GetProductByID(productID string) (*pbProduct.ProductResponse, error) {
+func GetProductByID(ctx context.Context, productID string) (*pbProduct.ProductResponse, error) {
 	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
 	if err != nil {
 		log.Printf("Could not connect to product-service: %v", err)
@@ -54,10 +54,27 @@ func GetProductByID(productID string) (*pbProduct.ProductResponse, error) {
 
 	client := pbProduct.NewProductServiceClient(conn)
 
-	ctx, cancel := context.WithTimeout(context.Background(), time.Second) 
-	defer cancel()
-
 	return client.GetProductByID(ctx, &pbProduct.ProductRequest{Id: productID})
+}
+
+func UpdateProductQuantity(ctx context.Context, productID string, quantity int32) (bool, error) {
+	conn, err := grpc.NewClient("localhost:50051", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		log.Printf("Could not connect to product-service: %v", err)
+	}
+	defer conn.Close()
+
+	client := pbProduct.NewProductServiceClient(conn)
+
+	res, err := client.UpdateProductQuantity(ctx, &pbProduct.UpdateQuantityRequest{
+		Id: productID,
+		Quantity: quantity,
+	})
+	if err != nil {
+		return false, fmt.Errorf("failed to update product quantity: %v", err)
+	}
+
+	return res.Success, nil
 }
 
 func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *pb.CreateOrderRequest) (*pb.CreateOrderResponse, error) {
@@ -65,12 +82,21 @@ func (s *OrderServiceServer) CreateOrder(ctx context.Context, req *pb.CreateOrde
 		return nil, fmt.Errorf("invalid input: product_id and quantity must be valid")
 	}
 
-	product, err := GetProductByID(req.ProductId)
+	product, err := GetProductByID(ctx, req.ProductId)
 	if err != nil {
 		return nil, fmt.Errorf("product not found: %v", err)
 	}
 
 	log.Printf("Ordering product: %s - $%.2f", product.Name, product.Price)
+
+	success, err := UpdateProductQuantity(ctx, req.ProductId, req.Quantity)
+	if err != nil {
+		return nil, fmt.Errorf("failed to update product quantity: %v", err)
+	}
+
+	if !success {
+		return nil, fmt.Errorf("insufficient product quantity")
+	}
 
 	order := Order{
 		OrderID: uuid.New().String(),
