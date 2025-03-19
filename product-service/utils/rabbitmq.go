@@ -23,17 +23,17 @@ type Order struct {
     Status       string `json:"Status"`
 }
 
-func ConnectToRabbitMQ(processFunc func(Order)) (*amqp.Connection, *amqp.Channel) {
+func ConnectToRabbitMQ(processFunc func(Order)) (*amqp.Connection, *amqp.Channel, error) {
 	var err error
 	rabbitConn, rabbitChannel, err = establishConnection()
 	if err != nil {
 		log.Printf("Initial connection to RabbitMQ failed: %v. Starting reconnection...", err)
 		go reconnectToRabbitMQ(processFunc)
-		return nil, nil
+		return nil, nil, err
 	}
 
 	go monitorCloseNotifications(rabbitConn, rabbitChannel, processFunc)
-	return rabbitConn, rabbitChannel
+	return rabbitConn, rabbitChannel, nil
 }
 
 func establishConnection() (*amqp.Connection, *amqp.Channel, error) {

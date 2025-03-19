@@ -10,7 +10,9 @@ import (
 	"gorm.io/gorm"
 )
 
-func SetupDatabase() {
+var DB *gorm.DB
+
+func SetupDatabase() error {
 	var err error
 
 	if err := godotenv.Load("../.env"); err != nil {
@@ -36,4 +38,21 @@ func SetupDatabase() {
 	}
 
 	log.Println("Database connected successfully!")
+	return nil
+}
+
+func CloseDatabase() {
+	if DB != nil {
+		sqlDB, err := DB.DB()
+		if err != nil {
+			log.Println("failed to get underlying SQL DB:", err)
+			return
+		}
+		err = sqlDB.Close()
+		if err != nil {
+			log.Println("failed to close database connection:", err)
+		} else {
+			log.Println("Database connection closed successfully.")
+		}
+	}
 }
