@@ -1,6 +1,6 @@
 # Ecommerce Microservices Project
 
-This project implements a microservices architecture for an ecommerce platform, consisting of **Product**, **Order**, **Auth**, and **Notification** services. The services are implemented in Go, using **gRPC** for communication, **RabbitMQ** for message brokering, and **Redis** for caching.
+This project implements a microservices architecture for an ecommerce platform, consisting of **Product**, **Order**, **Auth**, and services. The services are implemented in Go, using **gRPC** for communication, **RabbitMQ** for message brokering, and **Redis** for caching.
 
 ---
 
