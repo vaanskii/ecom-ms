@@ -6,7 +6,7 @@ This project implements a microservices architecture for an ecommerce platform, 
 
 ## **Project Structure**
 
-```python
+```text
 ecommerce-microservices/
 ├── auth-service/
 ├── docker-compose.yml
@@ -70,7 +70,7 @@ go run main.go
 ```
 
 #### After runing u should get back:
-``` python 
+``` text 
 ➜  product-service: go run main.go
 Database connected successfully!
 Connected to Redis successfully!
@@ -87,7 +87,7 @@ cd order-service
 go run main.go
 ```
 #### After runing u should get back:
-``` python 
+``` text 
 ➜  order-service: go run main.go
 Database connected successfully!
 Connected to RabbitMQ and channel opened...
@@ -103,7 +103,7 @@ cd auth-service
 go run main.go
 ```
 #### After runing u should get back:
-``` python 
+``` text 
 auth-service: go run main.go
 Generated Token eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Ikdpb3JnaSIsImV4cCI6MTc0MjQ3NDk2OX0.QBNfn4VuYZkv2oDn3ElQdV7W1oMpeb-G7a5o96mBIJU
 Token Valid: true
@@ -112,7 +112,7 @@ Username from Token: Username
 ---
 
 ### Message Broker: RabbitMQ
-```python 
+```text 
 RabbitMQ is used for message brokering:
 
 Exchange: order_events
@@ -128,7 +128,7 @@ Port 15672 for management UI (accessible at http://localhost:15672).
 
 
 ### Cache: Redis
-```python
+```text
 Redis is used for caching frequently accessed product data in the product-service. It is exposed on port 6379.
 ```
 
@@ -148,12 +148,12 @@ go run main.go
 ```
 
 #### After runing u should get back:
-```python
+```text
 order-service: ✗ go run main.go
 2025/03/19 16:54:28 Order created successfully: ID=6dde6258-c70b-4426-a578-cd77959f0945, Status=Order Created
 ```
 #### in product-service terminal you should get:
-```python
+```text
 Cache hit: Returning product from Redis {"ID":"2","Name":"TV","Price":799.99,"Quantity":72}
 
 2025/03/19 16:55:33 Processing Order: {OrderID:a4d8d2f5-d9f0-4b44-9387-a49959cfdaca ProductID:2 Quantity:1 CustomerName:Jack Marston Status:Order Created}. 
@@ -161,7 +161,7 @@ Product: &{ID:2 Name:TV Price:799.99 Quantity:70}
 ```
 
 #### in order-service terminal you should get:
-```python
+```text
 Ordering product: TV - $799.99
 
 2025/03/19 16:55:33 order saved to the database: 
